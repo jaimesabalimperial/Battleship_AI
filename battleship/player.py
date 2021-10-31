@@ -57,8 +57,10 @@ class Player:
         return None
     
     def has_lost(self):
-        """
-        :return: True if and only if all the ships of the player have sunk
+        """ Check whether player has lost the game.
+        
+        Returns:
+            bool: True if and only if all the ships of the player have sunk.
         """
         return self.board.have_all_ships_sunk()
 
