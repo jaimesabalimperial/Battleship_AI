@@ -84,8 +84,13 @@ class Board:
                 ships on the board that are near each other. Returns False 
                 otherwise
         """
-        # TODO: Complete this method
+        for idx, ship1 in enumerate(self.ships[:-1]):
+            for ship2 in self.ships[idx+1:]:
+                if ship1.is_near_ship(ship2):
+                    return True
+
         return False
+
         
     def have_all_ships_sunk(self):
         """ Check whether all ships have sunk.
@@ -94,8 +99,8 @@ class Board:
             bool : return True if all ships on the board have sunk.
                return False otherwise.
         """
-        # TODO: Complete this method
-        return False
+        
+        return all([ship.has_sunk() for ship in self.ships])
     
     def is_attacked_at(self, cell):
         """ Board is attacked at an (x, y) cell coordinate.
@@ -114,9 +119,15 @@ class Board:
         """
         # Mark the cell that has been attacked for visualisation purposes
         self.marked_cells.add(cell)
-        
-        # TODO: Complete this method
-        return False, False
+
+        #iterate over all ships
+        for ship in self.ships:
+            #assuming no cell is targetter twice?
+            if ship.is_occupying_cell(cell) and cell not in ship.damaged_cells:
+                ship.receive_damage(cell) 
+                return True, ship.has_sunk() #ship has been hit but don't know if ship has sunk
+
+        return False, False #if ship hasn't been hit, it hasn't sunk either (duh)
         
     def print(self, show_ships=False):
         """ Visualise the board on the terminal.
