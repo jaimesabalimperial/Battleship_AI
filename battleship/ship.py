@@ -72,8 +72,15 @@ class Ship:
         Returns:
             set[tuple] : Set of (x ,y) coordinates of all cells a ship occupies
         """
-        # TODO: Complete this method
-        return set()
+        curr_cell = (self.x_start, self.y_start) #initialise to starting cell
+        cells = set()
+        step = (int(self.is_horizontal()), int(self.is_vertical())) #step to take
+
+        while len(cells) != self.length():
+            cells.add(curr_cell)
+            curr_cell = (curr_cell[0] + step[0], curr_cell[1] + step[1])
+
+        return cells
 
     def length(self):
         """ Get length of ship (the number of cells the ship occupies).
@@ -82,11 +89,10 @@ class Ship:
             length (int) : The number of cells the ship occupies
         """
         if self.is_horizontal():
-            length = int(self.x_end - self.x_start)
+            return int(self.x_end - self.x_start) + 1
         elif self.is_vertical():
-            length = int(self.y_end - self.y_start)
+            return int(self.y_end - self.y_start) + 1
 
-        return length
 
     def is_occupying_cell(self, cell):
         """ Check whether the ship is occupying a given cell
@@ -99,8 +105,7 @@ class Ship:
             bool : return True if the given cell is one of the cells occupied 
                 by the ship. Otherwise, return False
         """
-        # TODO: Complete this method
-        return False
+        return cell in self.cells
     
     def receive_damage(self, cell):
         """ Receive attack at given cell. 
@@ -118,8 +123,11 @@ class Ship:
             bool : return True if the ship is occupying cell (ship is hit). 
                 Return False otherwise.
         """
-        # TODO: Complete this method
-        return False
+        if self.is_occupying_cell(cell):
+            self.damaged_cells.add(cell)
+            return True
+        else:
+            return False
     
     def count_damaged_cells(self):
         """ Count the number of cells that have been damaged.
@@ -127,8 +135,8 @@ class Ship:
         Returns:
             int : the number of cells that are damaged.
         """
-        # TODO: Complete this method
-        return 0
+
+        return len(self.damaged_cells)
         
     def has_sunk(self):
         """ Check whether the ship has sunk.
@@ -137,8 +145,7 @@ class Ship:
             bool : return True if the ship is damaged at all its positions. 
                 Otherwise, return False
         """
-        # TODO: Complete this method
-        return False
+        return self.damaged_cells == self.cells
     
     def is_near_ship(self, other_ship):
         """ Check whether a ship is near another ship instance.
@@ -154,8 +161,7 @@ class Ship:
         """
         assert isinstance(other_ship, Ship)
         
-        # TODO: Complete this method
-        return False
+        return any([self.is_near_cell(cell) for cell in other_ship.cells])
 
     def is_near_cell(self, cell):
         """ Check whether the ship is near an (x,y) cell coordinate.
