@@ -51,8 +51,7 @@ class Ship:
         Returns:
             bool : True if the ship is vertical. False otherwise.
         """
-        # TODO: Complete this method
-        return False
+        return self.x_start == self.x_end
    
     def is_horizontal(self):
         """ Check whether the ship is horizontal.
@@ -60,8 +59,7 @@ class Ship:
         Returns:
             bool : True if the ship is horizontal. False otherwise.
         """
-        # TODO: Complete this method
-        return False
+        return self.y_start == self.y_end
     
     def get_cells(self):
         """ Get the set of all cell coordinates that the ship occupies.
@@ -81,10 +79,14 @@ class Ship:
         """ Get length of ship (the number of cells the ship occupies).
         
         Returns:
-            int : The number of cells the ship occupies
+            length (int) : The number of cells the ship occupies
         """
-        # TODO: Complete this method
-        return 0
+        if self.is_horizontal():
+            length = int(self.x_end - self.x_start)
+        elif self.is_vertical():
+            length = int(self.y_end - self.y_start)
+
+        return length
 
     def is_occupying_cell(self, cell):
         """ Check whether the ship is occupying a given cell
