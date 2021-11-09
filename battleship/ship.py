@@ -280,11 +280,15 @@ class ShipFactory:
             for dx, dy in steps: 
                 x_end = start_loc[0] + dx
                 y_end = start_loc[1] + dy
+                
+                if (x_end < 1 or y_end < 1) or (x_end > self.board_size[0] or y_end > self.board_size[1]):
+                    continue
 
                 end_loc = (x_end, y_end)
+                ship = Ship(start_loc, end_loc) #create ship object
 
-                ship = Ship(start_loc, end_loc)
-
+                #if any of the cells that the ship occupies are not available, 
+                #disregard ship and move on to next one
                 if any([cell not in self.available_locs for cell in ship.get_cells()]):
                     continue
                 else:
