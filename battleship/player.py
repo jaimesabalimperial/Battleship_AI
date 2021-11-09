@@ -166,8 +166,83 @@ class AutomaticPlayer(Player):
         super().__init__(board=Board(), name=name)
         
         self.tracker = {}
+        self.prev_move = None
+        self.grid_locs = [(i, j) for i in range(1, self.board.width+1) for j in range(1, self.board.height+1)]
+        self.available_locs = self.grid_locs
+        self.curr_ship_locs = []
+        self.attacking_steps = [(1,0), (0,1),
+                                (-1,0), (0,-1)]
+
+        self.curr_step = None
+        self.attempted_steps = []
+
+    @property
+    def all_moves(self):
+        return list(self.tracker.keys())
+
+    def is_near_cell(self, cell, min_edge, max_edge):
+        """ Check whether the ship is near an (x,y) cell coordinate.
+
+        In the example below:
+        - There is a ship of length 3 represented by the letter S.
+        - The positions 1, 2, 3 and 4 are near the ship
+        - The positions 5 and 6 are NOT near the ship
+
+        --------------------------
+        |   |   |   |   | 3 |   |
+        -------------------------
+        |   | S | S | S | 4 | 5 |
+        -------------------------
+        | 1 |   | 2 |   |   |   |
+        -------------------------
+        |   |   | 6 |   |   |   |
+        -------------------------
+
+        Args:
+            cell (tuple[int, int]): tuple of 2 positive integers representing
+                the (x, y) cell coordinates to compare
+
+        Returns:
+            bool : returns True if and only if the (x, y) coordinate is at most
+                one cell from any part of the ship OR is at the corner of the ship. Returns False otherwise.
+        """
+        return (min_edge[0]-1 <= cell[0] <= max_edge[0]+1 
+                and min_edge[1]-1 <= cell[1] <= max_edge[1]+1)
+
+    def disregard_nearby_cells(self):
+        """"""
+        #get edges of ship (maximum and minimum values of position wrt ship orientation)
+        if len(self.curr_ship_locs) == 1:
+            #if ship has length 1, set edges to be the same
+            min_edge = self.curr_ship_locs[0]
+            max_edge = self.curr_ship_locs[0] 
+        else:
+            if self.ship_is_vertical(): 
+                min_edge = min(self.curr_ship_locs, key=lambda loc: loc[1])
+                max_edge = max(self.curr_ship_locs, key=lambda loc: loc[1])
+            else: 
+                min_edge = min(self.curr_ship_locs, key=lambda loc: loc[0])
+                max_edge = max(self.curr_ship_locs, key=lambda loc: loc[0])
         
-        
+        for grid_cell in self.available_locs:
+            if self.is_near_cell(grid_cell, min_edge, max_edge):
+                if grid_cell in self.available_locs:
+                    self.available_locs.remove(grid_cell)
+
+
+    def ship_is_vertical(self):
+        """"""
+        return int(abs(self.curr_step[1]))
+
+    def step_is_legal(self, step, loc):
+        """"""
+        return (loc[0] + step[0], loc[1] + step[1]) in self.available_locs
+
+    def receive_result(self, is_ship_hit, has_ship_sunk):
+        """Record result of last move on self.tracker."""
+
+        self.tracker[self.prev_move] = (is_ship_hit, has_ship_sunk)
+
     def select_target(self):
         """ Select target coordinates to attack.
         
@@ -176,5 +251,67 @@ class AutomaticPlayer(Player):
                 next attack
         """
         #first target location should be in the center of the board where
-        #there is a highets probability of a ship being initilised by the ship generator. 
-        return (1, 1)
+        #there is a highest probability of a ship being placed (i.e having a cell)
+        if len(self.all_moves) == 0:
+            target_cell = (self.board.width//2 + 1, self.board.height//2 + 1)
+            self.prev_move = target_cell
+            return target_cell
+
+        #if ship was hit but not sunk
+        if self.tracker[self.prev_move] == (True, False):
+            self.curr_ship_locs.append(self.prev_move)
+
+            hit_loc = self.prev_move
+            #if ship has only been hit once, choose next target from random step from all four directions
+            #if this condition isn't met, follow successful step once again
+            if len(self.curr_ship_locs) == 1:
+                possible_steps = [step for step in self.attacking_steps if self.step_is_legal(step, hit_loc)] #only choose from legal steps
+                self.curr_step = random.choice(possible_steps)
+
+            else:
+                #edge case --> check if player ran into edge before sinking ship 
+                if not self.step_is_legal(step=self.curr_step, loc=self.prev_move):
+                    hit_loc = self.curr_ship_locs[0]
+                    self.curr_step = tuple([-step for step in self.curr_step])
+
+            target_cell = (hit_loc[0] + self.curr_step[0], hit_loc[1] + self.curr_step[1])
+
+        #if ship was hit and sunk
+        elif self.tracker[self.prev_move] == (True, True):
+            self.curr_ship_locs.append(self.prev_move)
+
+            self.disregard_nearby_cells() #disregard cells surrounding ships for next random guesses
+            self.curr_ship_locs = [] #reinitialise target ship locs list
+            self.curr_step = None
+            self.attempted_steps = []
+
+            target_cell = random.choice(self.available_locs)
+
+        #if miss
+        else:
+            #account for case where a ship is in the radar (i.e recently hit but not sunk)
+            if len(self.curr_ship_locs) == 1:
+                self.attempted_steps.append(self.curr_step)
+
+                #make step from hit location
+                hit_loc = self.curr_ship_locs[0]
+
+                #retrieve steps that haven't been tried yet and choose a random one of them
+                possible_steps = [step for step in self.attacking_steps if step not in self.attempted_steps and self.step_is_legal(step, hit_loc)]
+                self.curr_step = random.choice(possible_steps)
+                target_cell = (hit_loc[0] + self.curr_step[0], hit_loc[1] + self.curr_step[1])
+
+            #if miss but hit more than once, just have to reverse step and take it from first hit location
+            elif len(self.curr_ship_locs) > 1: 
+                first_hit_loc = self.curr_ship_locs[0]
+                self.curr_step = tuple([-step for step in self.curr_step])
+                target_cell = (first_hit_loc[0] + self.curr_step[0], first_hit_loc[1] + self.curr_step[1])
+
+            #if no ship is in radar and previous hit was a miss
+            else: 
+                self.available_locs.remove(self.prev_move) 
+                target_cell = random.choice(self.available_locs)
+
+        self.prev_move = target_cell
+
+        return target_cell

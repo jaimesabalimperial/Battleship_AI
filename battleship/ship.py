@@ -296,7 +296,7 @@ class ShipFactory:
                 ships.append(ship) #append to list
                 self.retrieved_ships[ship_length] += 1
                 ship_length = self.next_ship_length()
-        print(ships)
+
         return ships
 
             
