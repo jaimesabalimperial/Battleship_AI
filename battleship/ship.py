@@ -281,25 +281,22 @@ class ShipFactory:
                 x_end = start_loc[0] + dx
                 y_end = start_loc[1] + dy
                 
-                if (x_end < 1 or y_end < 1) or (x_end > self.board_size[0] or y_end > self.board_size[1]):
-                    continue
-
                 end_loc = (x_end, y_end)
                 ship = Ship(start_loc, end_loc) #create ship object
 
-                #if any of the cells that the ship occupies are not available, 
-                #disregard ship and move on to next one
-                if any([cell not in self.available_locs for cell in ship.get_cells()]):
-                    continue
-                else:
+                #need that all cells within ship are available and that ship is 
+                #not near any other ship
+                if (all([cell in self.available_locs for cell in list(ship.get_cells())])
+                    and all([not ship.is_near_ship(other_ship) for other_ship in ships])):
                     ship_found = True
+                    break
                     
             if ship_found:        
                 self.remove_nearby_cells(ship) #remove cells that are near ship from available cells
                 ships.append(ship) #append to list
                 self.retrieved_ships[ship_length] += 1
                 ship_length = self.next_ship_length()
-
+        print(ships)
         return ships
 
             

@@ -24,8 +24,8 @@ class ManualVsManualSimulation:
         ]
 
         # Creating their boards
-        alice_board = Board(alice_ships)
-        bob_board = Board(bob_ships)
+        alice_board = Board() #Board(alice_ships)
+        bob_board = Board() #Board(bob_ships)
 
         # Creating the players
         alice = ManualPlayer(alice_board, name="Alice")

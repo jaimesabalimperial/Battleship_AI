@@ -165,7 +165,7 @@ class AutomaticPlayer(Player):
         # Initialise with a board with ships automatically arranged.
         super().__init__(board=Board(), name=name)
         
-        # TODO: Add any other attributes necessary for your strategic player
+        self.tracker = {}
         
         
     def select_target(self):
@@ -175,5 +175,6 @@ class AutomaticPlayer(Player):
             tuple[int, int] : (x, y) cell coordinates at which to launch the 
                 next attack
         """
-        # TODO: Complete this method
+        #first target location should be in the center of the board where
+        #there is a highets probability of a ship being initilised by the ship generator. 
         return (1, 1)
