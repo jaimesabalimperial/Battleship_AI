@@ -176,10 +176,6 @@ class AutomaticPlayer(Player):
         self.curr_step = None
         self.attempted_steps = []
 
-    @property
-    def all_moves(self):
-        return list(self.tracker.keys())
-
     def is_near_cell(self, cell, min_edge, max_edge):
         """ Check whether the ship is near an (x,y) cell coordinate.
 
@@ -274,7 +270,7 @@ class AutomaticPlayer(Player):
                     hit_loc = self.curr_ship_locs[0]
                     self.curr_step = tuple([-step for step in self.curr_step])
 
-            target_cell = (hit_loc[0] + self.curr_step[0], hit_loc[1] + self.curr_step[1])
+            target_cell = (hit_loc[0] + self.curr_step[0], hit_loc[1] + self.curr_step[1]) #update target cell
 
         #if ship was hit and sunk
         elif self.tracker[self.prev_move] == (True, True):
@@ -285,7 +281,7 @@ class AutomaticPlayer(Player):
             self.curr_step = None
             self.attempted_steps = []
 
-            target_cell = random.choice(self.available_locs)
+            target_cell = random.choice(self.available_locs) #choose random target from available locations
 
         #if miss
         else:
