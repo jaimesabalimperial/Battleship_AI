@@ -205,12 +205,14 @@ class ShipFactory:
                 the count as values. Defaults to 1 ship each for lengths 1-5.
         """
         self.board_size = board_size
+        self.grid_locs = [(i, j) for i in range(1, board_size[0]+1) for j in range(1, board_size[1]+1)]
         
         if ships_per_length is None:
             # Default: lengths 1 to 5, one ship each
             self.ships_per_length = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}
         else:
             self.ships_per_length = ships_per_length
+
 
     @classmethod
     def create_ship_from_str(cls, start, end, board_size=(10,10)):
@@ -230,6 +232,19 @@ class ShipFactory:
         converter = CellConverter(board_size)
         return Ship(start=converter.from_str(start),
                     end=converter.from_str(end))
+    
+    def next_ship_length(self):
+        """Retrieves the length of the next ship to generate. """
+        for length, num_ships in list(self.retrieved_ships.items()):
+            if self.ships_per_length[length] != num_ships:
+                return length
+    
+    def remove_nearby_cells(self, ship):
+        """Removes cells that ship is occupying or near of from self.available_locs."""
+        for grid_cell in self.available_locs:
+            if ship.is_near_cell(grid_cell):
+                self.available_locs.remove(grid_cell)
+
 
     def generate_ships(self):
         """ Generate a list of ships in the appropriate configuration.
@@ -244,11 +259,46 @@ class ShipFactory:
         Returns:
             list[Ships] : A list of Ship instances, adhering to the rules above
         """
-        # TODO: Complete this method
         ships = []
+        ship_lengths = list(self.ships_per_length.keys())
+        self.retrieved_ships = dict.fromkeys(ship_lengths, 0)
+        self.available_locs = self.grid_locs
+        ship_length = ship_lengths[0]
+        
+        while self.retrieved_ships != self.ships_per_length:
+            start_loc = random.choice(self.available_locs) #choose random available location
+            ship_found = False
+
+            #steps from start location to end location
+            step_size = ship_length - 1
+            steps = [(step_size, 0), (0, step_size),
+                     (-step_size, 0), (0, -step_size)]
+
+            #check if end locations are available
+            # and iterate over shuffled steps (so there is no bias for vertical or horizontal ships)
+            random.shuffle(steps)
+            for dx, dy in steps: 
+                x_end = start_loc[0] + dx
+                y_end = start_loc[1] + dy
+
+                end_loc = (x_end, y_end)
+
+                ship = Ship(start_loc, end_loc)
+
+                if any([cell not in self.available_locs for cell in ship.get_cells()]):
+                    continue
+                else:
+                    ship_found = True
+                    
+            if ship_found:        
+                self.remove_nearby_cells(ship) #remove cells that are near ship from available cells
+                ships.append(ship) #append to list
+                self.retrieved_ships[ship_length] += 1
+                ship_length = self.next_ship_length()
+
         return ships
-        
-        
+
+            
 if __name__ == '__main__':
     # SANDBOX for you to play and test your methods
 
