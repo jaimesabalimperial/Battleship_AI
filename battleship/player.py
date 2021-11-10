@@ -278,7 +278,7 @@ class AutomaticPlayer(Player):
                 self.curr_step = random.choice(possible_steps)
 
             else:
-                #edge case --> check if player ran into edge before sinking ship 
+                #edge case --> check if player will run into edge before sinking ship 
                 if not self.step_is_legal(step=self.curr_step, loc=self.prev_move):
                     hit_loc = self.curr_ship_locs[0]
                     self.curr_step = tuple([-step for step in self.curr_step])
