@@ -176,6 +176,10 @@ class AutomaticPlayer(Player):
         self.curr_step = None
         self.attempted_steps = []
 
+    @property
+    def all_moves(self):
+        return list(self.tracker.keys())
+
     def is_near_cell(self, cell, min_edge, max_edge):
         """ Check whether the ship is near an (x,y) cell coordinate.
 
@@ -292,7 +296,7 @@ class AutomaticPlayer(Player):
                 #make step from hit location
                 hit_loc = self.curr_ship_locs[0]
 
-                #retrieve steps that haven't been tried yet and choose a random one of them
+                #retrieve steps that haven't been tried yet and choose a random one of them that is legal
                 possible_steps = [step for step in self.attacking_steps if step not in self.attempted_steps and self.step_is_legal(step, hit_loc)]
                 self.curr_step = random.choice(possible_steps)
                 target_cell = (hit_loc[0] + self.curr_step[0], hit_loc[1] + self.curr_step[1])
