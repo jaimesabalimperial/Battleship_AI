@@ -98,6 +98,8 @@ class RandomVsAutomaticSimulation:
         game = Game(player1=alice, player2=bob)
         game.play()
 
+        return game.player1.has_lost()
+
 
 class AutomaticVsAutomaticSimulation:
     """ Get your AI players to battle each other! """
