@@ -178,6 +178,7 @@ class AutomaticPlayer(Player):
 
     @property
     def all_moves(self):
+        """Function called when self.all_moves attribute is called --> returns list of all moves made. """
         return list(self.tracker.keys())
 
     def is_near_cell(self, cell, min_edge, max_edge):
@@ -210,7 +211,8 @@ class AutomaticPlayer(Player):
                 and min_edge[1]-1 <= cell[1] <= max_edge[1]+1)
 
     def disregard_nearby_cells(self):
-        """"""
+        """Removes cells that are nearby to sunken ship (according to definition in battleship.ship) 
+           from self.available_locations."""
         #get edges of ship (maximum and minimum values of position wrt ship orientation)
         if len(self.curr_ship_locs) == 1:
             #if ship has length 1, set edges to be the same
@@ -231,11 +233,18 @@ class AutomaticPlayer(Player):
 
 
     def ship_is_vertical(self):
-        """"""
+        """ Check whether the ship is vertical.
+        
+        Returns:
+            bool : True if the ship is vertical. False otherwise.
+        """
         return int(abs(self.curr_step[1]))
 
     def step_is_legal(self, step, loc):
-        """"""
+        """Check wether taking step from loc results in the consequent position being an available location.
+        
+        Returns: 
+            bool: True if next position is available. False otherwise."""
         return (loc[0] + step[0], loc[1] + step[1]) in self.available_locs
 
     def receive_result(self, is_ship_hit, has_ship_sunk):
@@ -278,7 +287,7 @@ class AutomaticPlayer(Player):
 
         #if ship was hit and sunk
         elif self.tracker[self.prev_move] == (True, True):
-            self.curr_ship_locs.append(self.prev_move)
+            self.curr_ship_locs.append(self.prev_move) #append last ship location to list
 
             self.disregard_nearby_cells() #disregard cells surrounding ships for next random guesses
             self.curr_ship_locs = [] #reinitialise target ship locs list
@@ -289,7 +298,7 @@ class AutomaticPlayer(Player):
 
         #if miss
         else:
-            #account for case where a ship is in the radar (i.e recently hit but not sunk)
+            #account for case where a ship is in the radar (i.e hit on previous to previous move but not sunk)
             if len(self.curr_ship_locs) == 1:
                 self.attempted_steps.append(self.curr_step)
 
@@ -309,8 +318,8 @@ class AutomaticPlayer(Player):
 
             #if no ship is in radar and previous hit was a miss
             else: 
-                self.available_locs.remove(self.prev_move) 
-                target_cell = random.choice(self.available_locs)
+                self.available_locs.remove(self.prev_move)  #remove miss loc from available locations 
+                target_cell = random.choice(self.available_locs)  #choose a random location out of available locations
 
         self.prev_move = target_cell
 
