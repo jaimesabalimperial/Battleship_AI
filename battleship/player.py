@@ -227,9 +227,8 @@ class AutomaticPlayer(Player):
                 max_edge = max(self.curr_ship_locs, key=lambda loc: loc[0])
         
         for grid_cell in self.available_locs:
-            if self.is_near_cell(grid_cell, min_edge, max_edge):
-                if grid_cell in self.available_locs:
-                    self.available_locs.remove(grid_cell)
+            if self.is_near_cell(grid_cell, min_edge, max_edge) and grid_cell in self.available_locs:
+                self.available_locs.remove(grid_cell)
 
 
     def ship_is_vertical(self):

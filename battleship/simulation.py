@@ -111,3 +111,6 @@ class AutomaticVsAutomaticSimulation:
         # Creating and launching the game
         game = Game(player1=alice, player2=bob)
         game.play()
+
+        return game.player1.has_lost()
+
