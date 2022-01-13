@@ -323,3 +323,4 @@ class AutomaticPlayer(Player):
         self.prev_move = target_cell
 
         return target_cell
+

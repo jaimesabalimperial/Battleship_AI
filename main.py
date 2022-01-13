@@ -21,5 +21,5 @@ if __name__ == '__main__':
         except ValueError:
             index = 0
             
-    simulation = simulations[index]
+    simulation = simulations[5]
     simulation.run()
