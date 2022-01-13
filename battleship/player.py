@@ -321,6 +321,5 @@ class AutomaticPlayer(Player):
                 target_cell = random.choice(self.available_locs)  #choose a random location out of available locations
 
         self.prev_move = target_cell
-
         return target_cell
 
