@@ -4,19 +4,18 @@ from battleship.board import Board
 from battleship.convert import CellConverter
 
 class Player:
-    """ Class representing the player
-    """
+    """Class representing the player."""
+    
     count = 0  # for keeping track of number of players
     
     def __init__(self, board=None, name=None):
-        """ Initialises a new player with its board.
+        """Initialise a new player with its board.
 
         Args:
             board (Board): The player's board. If not provided, then a board
                 will be generated automatically
             name (str): Player's name
         """
-        
         if board is None:
             self.board = Board()
         else:
@@ -29,10 +28,11 @@ class Player:
             self.name = name
     
     def __str__(self):
+        """."""
         return self.name
     
     def select_target(self):
-        """ Select target coordinates to attack.
+        """Select target coordinates to attack.
         
         Abstract method that should be implemented by any subclasses of Player.
         
@@ -43,7 +43,7 @@ class Player:
         raise NotImplementedError
     
     def receive_result(self, is_ship_hit, has_ship_sunk):
-        """ Receive results of latest attack.
+        """Receive results of latest attack.
         
         Player receives notification on the outcome of the latest attack by the 
         player, on whether the opponent's ship is hit, and whether it has been 
@@ -57,7 +57,7 @@ class Player:
         return None
     
     def has_lost(self):
-        """ Check whether player has lost the game.
+        """Check whether player has lost the game.
         
         Returns:
             bool: True if and only if all the ships of the player have sunk.
@@ -66,10 +66,10 @@ class Player:
 
 
 class ManualPlayer(Player):
-    """ A player playing manually via the terminal
-    """
+    """A player playing manually via the terminal."""
+    
     def __init__(self, board, name=None):
-        """ Initialise the player with a board and other attributes.
+        """Initialise the player with a board and other attributes.
         
         Args:
             board (Board): The player's board. If not provided, then a board
@@ -80,7 +80,7 @@ class ManualPlayer(Player):
         self.converter = CellConverter((board.width, board.height))
         
     def select_target(self):
-        """ Read coordinates from user prompt.
+        """Read coordinates from user prompt.
                
         Returns:
             tuple[int, int] : (x, y) cell coordinates at which to launch the 
@@ -98,13 +98,14 @@ class ManualPlayer(Player):
 
 
 class RandomPlayer(Player):
-    """ A Player that plays at random positions.
+    """A Player that plays at random positions.
 
     However, it does not play at the positions:
     - that it has previously attacked
     """
+    
     def __init__(self, name=None):
-        """ Initialise the player with an automatic board and other attributes.
+        """Initialise the player with an automatic board and other attributes.
         
         Args:
             name (str): Player's name
@@ -114,7 +115,7 @@ class RandomPlayer(Player):
         self.tracker = set()
 
     def select_target(self):
-        """ Generate a random cell that has previously not been attacked.
+        """Generate a random cell that has previously not been attacked.
         
         Also adds cell to the player's tracker.
         
@@ -127,11 +128,11 @@ class RandomPlayer(Player):
         return target_cell
 
     def generate_random_target(self):
-        """ Generate a random cell that has previously not been attacked.
+        """Generate a random cell that has previously not been attacked.
                
         Returns:
             tuple[int, int] : (x, y) cell coordinates at which to launch the 
-                next attack
+            next attack.
         """
         has_been_attacked = True
         random_cell = None
@@ -143,11 +144,11 @@ class RandomPlayer(Player):
         return random_cell
 
     def get_random_coordinates(self):
-        """ Generate random coordinates.
+        """Generate random coordinates.
                
         Returns:
             tuple[int, int] : (x, y) cell coordinates at which to launch the 
-                next attack
+            next attack.
         """
         x = random.randint(1, self.board.width)
         y = random.randint(1, self.board.height)
@@ -155,9 +156,10 @@ class RandomPlayer(Player):
 
 
 class AutomaticPlayer(Player):
-    """ Player playing automatically using a strategy."""
+    """Player playing automatically using a strategy."""
+    
     def __init__(self, name=None):
-        """ Initialise the player with an automatic board and other attributes.
+        """Initialise the player with an automatic board and other attributes.
         
         Args:
             name (str): Player's name
@@ -178,7 +180,7 @@ class AutomaticPlayer(Player):
 
     @property
     def all_moves(self):
-        """Function called when self.all_moves attribute is called --> returns list of all moves made. """
+        """Function called when self.all_moves attribute is called --> returns list of all moves made."""
         return list(self.tracker.keys())
 
     def is_near_cell(self, cell, min_edge, max_edge):
