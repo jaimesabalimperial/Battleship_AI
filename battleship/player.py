@@ -213,8 +213,9 @@ class AutomaticPlayer(Player):
                 and min_edge[1]-1 <= cell[1] <= max_edge[1]+1)
 
     def disregard_nearby_cells(self):
-        """Removes cells that are nearby to sunken ship (according to definition in battleship.ship) 
-           from self.available_locations."""
+        """Remove cells that are nearby to sunken ship (according to definition in battleship.ship)
+           from self.available_locations.
+        """
         #get edges of ship (maximum and minimum values of position wrt ship orientation)
         if len(self.curr_ship_locs) == 1:
             #if ship has length 1, set edges to be the same
@@ -234,7 +235,7 @@ class AutomaticPlayer(Player):
 
 
     def ship_is_vertical(self):
-        """ Check whether the ship is vertical.
+        """Check whether the ship is vertical.
         
         Returns:
             bool : True if the ship is vertical. False otherwise.
@@ -245,16 +246,16 @@ class AutomaticPlayer(Player):
         """Check wether taking step from loc results in the consequent position being an available location.
         
         Returns: 
-            bool: True if next position is available. False otherwise."""
+            bool: True if next position is available. False otherwise.
+        """
         return (loc[0] + step[0], loc[1] + step[1]) in self.available_locs
 
     def receive_result(self, is_ship_hit, has_ship_sunk):
         """Record result of last move on self.tracker."""
-
         self.tracker[self.prev_move] = (is_ship_hit, has_ship_sunk)
 
     def select_target(self):
-        """ Select target coordinates to attack.
+        """Select target coordinates to attack.
         
         Returns:
             tuple[int, int] : (x, y) cell coordinates at which to launch the 
